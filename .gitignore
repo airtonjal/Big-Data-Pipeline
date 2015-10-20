@@ -1,0 +1,9 @@
+.idea/
+.gradle/
+*.log
+*.iml
+build/
+projectFilesBackup/
+out/
+.DS_Store
+target/
