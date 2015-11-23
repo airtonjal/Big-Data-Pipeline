@@ -7,3 +7,8 @@ projectFilesBackup/
 out/
 .DS_Store
 target/
+project/target/
+project/project/
+out.txt
+*/target/
+*/*.iml
