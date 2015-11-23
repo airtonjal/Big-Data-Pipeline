@@ -1,0 +1,59 @@
+apply plugin: 'java'
+
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    storm
+    compile.extendsFrom storm
+}
+
+dependencies {
+    compile project(':commons')
+
+    // Kafka
+    compile (group: 'org.apache.kafka', name:'kafka_2.10', version:"$kafkaVersion") {
+        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    }
+
+    // Elasticsearch
+    compile group: 'org.elasticsearch', name: 'elasticsearch', version: "$elasticsearchVersion"
+
+    // Storm
+    storm (group: 'org.apache.storm', name:'storm-core',  version:"$stormVersion") {
+//            exclude group: 'ch.qos.logback', module: 'logback-classic'
+//            exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+//            exclude group: 'org.slf4j', module: 'log4j-over-slf4j'
+//            exclude group: 'log4j', module: 'log4j'
+    }
+    compile (group: 'org.apache.storm', name:'storm-kafka', version:"$stormVersion") {
+//            exclude group: 'org.slf4j', module: 'slf4j-api'
+//            exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+//            exclude group: 'org.slf4j', module: 'log4j-over-slf4j'
+    }
+
+    compile group:'com.github.tototoshi', name:'scala-csv_' + scalaMajor, version: "$scalaCSVVersion"
+
+    compile group: 'org.apache.commons', name: 'commons-math3', version: "3.4"
+
+}
+
+//create a single Jar with all dependencies
+task stormJar(type: Jar) {
+    archiveName "pipeline-pchr-storm-${version}.jar"
+    manifest {
+        attributes 'Implementation-Title': 'Pipeline Storm fat jar',
+                'Implementation-Version': version,
+                'Main-Class': 'com.webradar.poc.stream.Main'
+    }
+    baseName = project.name + '-all'
+    from {
+        (configurations.runtime - configurations.storm).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    with jar
+}
